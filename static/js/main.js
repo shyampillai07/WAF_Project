@@ -28,40 +28,39 @@ document.addEventListener("DOMContentLoaded", function () {
         submitBtn.disabled = true;
 
         fetch(`/check?input=${encodeURIComponent(userInput)}`)
-            .then(response => response.json())
-            .then(data => {
-                loader.style.display = "none";
-                submitBtn.disabled = false;
-                console.log("Server Response:", data);
+    .then(response => response.json())
+    .then(data => {
+        loader.style.display = "none";
+        submitBtn.disabled = false;
+        console.log("Server Response:", data);
 
-                if (data.message.toLowerCase().includes("safe")) {
-                    showAlert(data.message,"success");
-                } else {
-                    showAlert(data.message, "danger");
-                }
-            })
-            .catch(error => {
-                console.error("Fetch Error:", error);
-                loader.style.display = "none";
-                submitBtn.disabled = false;
-                showAlert("An error occurred. Try again!", "danger");
-            });
+        // Check if data.message exists before accessing it
+        if (data.message && data.message.toLowerCase().includes("safe")) {
+            showAlert(data.message, "success");
+        } else if (data.error) {
+            showAlert(data.error, "danger"); // Display error message
+        } else {
+            showAlert("Unexpected response from the server.", "danger");
+        }
+    })
+    .catch(error => {
+        console.error("Fetch Error:", error);
+        loader.style.display = "none";
+        submitBtn.disabled = false;
+        showAlert("An error occurred. Try again!", "danger");
+    });
     }
     function showAlert(message, type) {
         console.log("Displaying Alert:", message, "Type:", type);
+        
+        const resultMessage = document.getElementById("result-message");
+        resultMessage.className = `alert alert-${type}`; // Set alert class based on type
+        resultMessage.innerHTML = message; // Set the alert message
+        resultMessage.style.display = "block"; // Show the alert
     
-        const resultBox = document.getElementById("result-box");
-        resultBox.style.display = "block";  // Ensure it's visible
-    
-        resultBox.innerHTML = `
-            <div class="alert alert-${type}" role="alert">
-                ${message}
-            </div>
-        `;
-    
-        // Set timeout to 15 seconds instead of 5
+        // Set timeout to hide alert after 15 seconds
         setTimeout(() => {
-            resultBox.style.display = "none";  
+            resultMessage.style.display = "none";  
         }, 15000);
     }
 });

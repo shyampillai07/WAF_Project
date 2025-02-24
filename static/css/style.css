@@ -65,7 +65,7 @@ input {
 }
 
 .alert {
-    display: none;
+    display: block;
     padding: 12px;
     margin-top: 10px;
     text-align: center;
