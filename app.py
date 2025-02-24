@@ -1,29 +1,39 @@
+from flask import Flask, request, render_template, jsonify
 import re
-import json
+import sqlite3
 import time
-from flask import Flask, request, jsonify
 
-app = Flask(__name__)
+app = Flask(__name__,static_folder="static")
 
 # Security Rules for SQL Injection & XSS
 BLOCKED_PATTERNS = [
     r"(\%27)|(\')|(\-\-)|(%23)|(#)",  # SQL Injection
-    r"(<script.*?>.*?</script>)|(<.*?javascript:.*?>)"  # XSS Detection
+    r"(<script>)|(<script>)"  # XSS
 ]
 
-
-# IP Tracking for Blocking
 BLOCKED_IPS = []
 REQUEST_LOGS = {}
 
-# Function to Check for Attacks
-def is_malicious(input_data):
-    for pattern in BLOCKED_PATTERNS:
-        if re.search(pattern, input_data, re.IGNORECASE):
-            return True
-    return False
+# Database setup (SQLite)
+def init_db():
+    conn = sqlite3.connect("waf_logs.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ip TEXT,
+            input TEXT,
+            timestamp TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/")
+def home():
+    return render_template("index.html")  # ✅ Only one home() function
+
+@app.route("/check", methods=["GET"])
 def waf():
     user_ip = request.remote_addr
     user_input = request.args.get("input", "")
@@ -31,7 +41,7 @@ def waf():
     # Rate Limiting - Prevent Too Many Requests
     current_time = time.time()
     if user_ip in REQUEST_LOGS:
-        if len(REQUEST_LOGS[user_ip]) >= 5:  # More than 5 requests in 10 seconds?
+        if len(REQUEST_LOGS[user_ip]) >= 5:  # More than 5 requests in 10 sec?
             if current_time - REQUEST_LOGS[user_ip][0] < 10:
                 BLOCKED_IPS.append(user_ip)
                 return jsonify({"error": "Too many requests. IP temporarily blocked."}), 403
@@ -50,16 +60,16 @@ def waf():
 
     return jsonify({"message": "Safe Request"}), 200
 
-# Logging Function
+def is_malicious(input_data):
+    return any(re.search(pattern, input_data, re.IGNORECASE) for pattern in BLOCKED_PATTERNS)
+
 def log_attack(ip, input_data):
-    attack_data = {
-        "ip": ip,
-        "input": input_data,
-        "time": time.strftime("%Y-%m-%d %H:%M:%S")
-    }
-    with open("logs.json", "a") as log_file:
-        json.dump(attack_data, log_file)
-        log_file.write("\n")
+    conn = sqlite3.connect("waf_logs.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO logs (ip, input, timestamp) VALUES (?, ?, ?)",
+                   (ip, input_data, time.strftime("%Y-%m-%d %H:%M:%S")))
+    conn.commit()
+    conn.close()
 
 if __name__ == "__main__":
     app.run(debug=True)
