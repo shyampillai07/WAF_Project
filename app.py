@@ -8,8 +8,9 @@ app = Flask(__name__)
 # Security Rules for SQL Injection & XSS
 BLOCKED_PATTERNS = [
     r"(\%27)|(\')|(\-\-)|(%23)|(#)",  # SQL Injection
-    r"(<script>)|(<script>)"  # XSS
+    r"(<script.*?>.*?</script>)|(<.*?javascript:.*?>)"  # XSS Detection
 ]
+
 
 # IP Tracking for Blocking
 BLOCKED_IPS = []
