@@ -1,0 +1,22 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore logs and database files
+logs/
+*.log
+database/waf_logs.db
+
+# Ignore virtual environment files
+venv/
+env/
+
+# Ignore system-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore deployment files
+*.render.yaml.swp
+Dockerfile
