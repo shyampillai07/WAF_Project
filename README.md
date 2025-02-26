@@ -1,32 +1,32 @@
-Web Application Firewall (WAF) Project 🛡️
+# **Web Application Firewall (WAF) Project** 🛡️  
 
-A Web Application Firewall (WAF) built using Flask and SQLite, designed to detect and block common web threats like SQL Injection, XSS, Command Injection, and LFI/RFI Attacks.
+A **Web Application Firewall (WAF)** built using **Flask** and **SQLite**, designed to detect and block common web threats like **SQL Injection, XSS, Command Injection, and LFI/RFI Attacks**.  
 
-🚀 Features
+## **🚀 Features**  
+👉 **SQL Injection Protection** – Detects and blocks malicious SQL queries.  
+👉 **Cross-Site Scripting (XSS) Protection** – Identifies and prevents script injections.  
+👉 **Command Injection Prevention** – Blocks dangerous system commands.  
+👉 **Local/Remote File Inclusion (LFI/RFI) Defense** – Restricts unauthorized file access.  
+👉 **IP Rate Limiting** – Limits repeated requests to prevent DoS attacks.  
+👉 **Logging & Monitoring** – Logs all suspicious activity and user inputs.  
+👉 **Docker & Render Deployment** – Easily deployable with Docker and Render.  
 
-✅ SQL Injection Protection – Detects and blocks malicious SQL queries.
-✅ Cross-Site Scripting (XSS) Protection – Identifies and prevents script injections.
-✅ Command Injection Prevention – Blocks dangerous system commands.
-✅ Local/Remote File Inclusion (LFI/RFI) Defense – Restricts unauthorized file access.
-✅ IP Rate Limiting – Limits repeated requests to prevent DoS attacks.
-✅ Logging & Monitoring – Logs all suspicious activity and user inputs.
-✅ Docker & Render Deployment – Easily deployable with Docker and Render.
+## **🛠️ Tech Stack**  
+- **Backend**: Python (Flask)  
+- **Database**: SQLite  
+- **Web Server**: Gunicorn  
+- **Containerization**: Docker  
+- **Deployment**: Render  
 
-🛠️ Tech Stack
+## **💂️ Security Checks Implemented**  
+- **SQL Injection (SQLi)** detection and blocking.  
+- **Cross-Site Scripting (XSS)** prevention.  
+- **Command Injection** filtering.  
+- **Path Traversal & Local File Inclusion (LFI/RFI)** blocking.  
+- **Rate Limiting** to prevent abuse.  
 
-Backend: Python (Flask)
-
-Database: SQLite
-
-Web Server: Gunicorn
-
-Containerization: Docker
-
-Deployment: Render
-
-
-📂 Project Structure
-
+## **📂 Project Structure**  
+```
 WAF_Project/
 │── database/             # SQLite database for logging attacks
 │── logs/                 # Stores application and access logs
@@ -38,47 +38,44 @@ WAF_Project/
 │── render.yaml           # Render deployment configuration
 │── requirements.txt      # Python dependencies
 │── README.md             # Project documentation
+```
 
-🖥️ Setup & Installation
-
-1️⃣ Clone the Repository
-
+## **🖥️ Setup & Installation**  
+### **1️⃣ Clone the Repository**  
+```sh
 git clone https://github.com/yourusername/WAF_Project.git
 cd WAF_Project
+```
 
-2️⃣ Install Dependencies
-
+### **2️⃣ Install Dependencies**  
+```sh
 pip install -r requirements.txt
+```
 
-3️⃣ Run the Application
-
+### **3️⃣ Run the Application**  
+```sh
 python app.py
+```
+The app will run at **http://127.0.0.1:5000**.
 
-The app will run at http://127.0.0.1:5000.
-
-🐳 Deploy with Docker
-
-1️⃣ Build the Docker Image
-
+## **🐳 Deploy with Docker**  
+### **1️⃣ Build the Docker Image**  
+```sh
 docker build -t waf_project .
+```
 
-2️⃣ Run the Container
-
+### **2️⃣ Run the Container**  
+```sh
 docker run -p 5000:5000 waf_project
+```
 
-🌍 Deploy on Render
+## **🌍 Deploy on Render**  
+1. Push your changes to **GitHub**  
+2. Connect the repository to **Render**  
+3. Use `render.yaml` for automatic deployment  
 
-1. Push your changes to GitHub
+## **🐝 Contributing**  
+Feel free to fork this repository, create new features, and submit pull requests!  
 
-
-2. Connect the repository to Render
-
-
-3. Use render.yaml for automatic deployment
-
-
-
-📜 License
-
-This project is open-source under the MIT License.
-
+## **📚 License**  
+This project is **open-source** under the **MIT License**.  
