@@ -1,0 +1,14 @@
+services:
+  - name: waf-app  # Change this to your app name
+    type: web
+    runtime: docker  # Since you are using Docker
+    repo: https://github.com/shyampillai07/WAF_Project  # Replace with your GitHub repo URL
+    branch: main  # The branch to deploy from
+    plan: free  # Change if you are using a paid plan
+    envVars:
+      - key: PORT
+        value: 5000  # Flask typically runs on port 5000
+      - key: DATABASE_URL
+        value: "sqlite:///database/waf_logs.db"  # Change if using a different database
+    healthCheckPath: "/"
+    autoDeploy: true  # Automatically redeploy when pushing new commits
