@@ -96,9 +96,10 @@ def user_input():
     return jsonify({"message": "Safe Request"}), 200
 
 # Serve Frontend
+@app.route("/")
 @app.route("/<path:path>")
 def serve_frontend(path="index.html"):
-    return send_from_directory("client/build", path)
+    return send_from_directory(app.static_folder, path)
 
 # WAF Functions
 def detect_attack(input_data):
