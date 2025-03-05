@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaDatabase, FaCode, FaTerminal, FaFolderOpen, FaTachometerAlt, FaShieldAlt } from "react-icons/fa";
 import "../styles/protectionrules.scss";
+import { API_BASE_URL } from "../config";
 
 const iconMap = {
   SQLi: <FaDatabase />,
@@ -23,7 +24,7 @@ const ProtectionRules = () => {
     const fetchRules = async () => {
       try {
         console.log("🔹 Fetching protection rules...");
-        const response = await fetch('${API_BASE_URL}/api/protection-rules');
+        const response = await fetch(`${API_BASE_URL}/api/protection-rules`);
 
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 

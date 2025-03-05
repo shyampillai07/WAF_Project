@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/home.scss";
 import { FaShieldAlt, FaUser } from "react-icons/fa";
+import { API_BASE_URL } from "../config";
 
 function Home() {
   const [message, setMessage] = useState("Loading...");
@@ -9,7 +10,7 @@ function Home() {
   useEffect(() => {
     console.log("✅ Home Component Loaded"); // Debugging
 
-    fetch('${API_BASE_URL}/api/home')
+    fetch(`${API_BASE_URL}/api/home`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
         return res.json();
