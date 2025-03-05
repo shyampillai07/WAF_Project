@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/home.scss";
 import { FaShieldAlt, FaUser } from "react-icons/fa";
-import { API_BASE_URL } from "../config";
+import API_BASE_URL  from "../config";
 
 function Home() {
   const [message, setMessage] = useState("Loading...");

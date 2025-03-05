@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../styles/userinputs.scss";
-import { API_BASE_URL } from "../config";
+import  API_BASE_URL  from "../config";
 
 const UserInput = () => {
   const [input, setInput] = useState("");

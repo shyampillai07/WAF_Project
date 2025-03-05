@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaDatabase, FaCode, FaTerminal, FaFolderOpen, FaTachometerAlt, FaShieldAlt } from "react-icons/fa";
 import "../styles/protectionrules.scss";
-import { API_BASE_URL } from "../config";
+import  API_BASE_URL  from "../config";
 
 const iconMap = {
   SQLi: <FaDatabase />,
