@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify ,send_from_directory
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import re
 import sqlite3
@@ -6,16 +6,20 @@ import time
 import logging
 import os
 
+# Flask App Initialization
 app = Flask(__name__, static_folder="client/build", static_url_path="/")
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "https://your-render-url.com"]}})  # CORS for local & deployed frontend
 
 # Create Directories
 os.makedirs("logs", exist_ok=True)
-os.makedirs("database", exist_ok=True)
+os.makedirs("/opt/render/database", exist_ok=True)
+
+# Database Path (Ensure persistence in Render)
+DB_PATH = os.environ.get("DATABASE_URL", "sqlite:////opt/render/database/waf_logs.db")
 
 # Initialize Database
 def init_db():
-    conn = sqlite3.connect("database/waf_logs.db")
+    conn = sqlite3.connect(DB_PATH.replace("sqlite:///", ""))
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS logs (
@@ -35,12 +39,12 @@ log_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 def setup_logger(name, log_file):
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
-    
+
     if not logger.handlers:
         handler = logging.FileHandler(log_file)
         handler.setFormatter(log_formatter)
         logger.addHandler(handler)
-    
+
     return logger
 
 access_logger = setup_logger("access", "logs/access.log")
@@ -95,7 +99,7 @@ def user_input():
 
     return jsonify({"message": "Safe Request"}), 200
 
-# Serve Frontend
+# Serve Frontend (React App)
 @app.route("/")
 @app.route("/<path:path>")
 def serve_frontend(path="index.html"):
@@ -116,7 +120,7 @@ def detect_attack(input_data):
 
 def log_attack(ip, input_data, threat_detected):
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    conn = sqlite3.connect("database/waf_logs.db")
+    conn = sqlite3.connect(DB_PATH.replace("sqlite:///", ""))
     cursor = conn.cursor()
     cursor.execute("INSERT INTO logs (ip, input, threat, timestamp) VALUES (?, ?, ?, ?)",
                    (ip, input_data, threat_detected, timestamp))
@@ -124,6 +128,6 @@ def log_attack(ip, input_data, threat_detected):
     conn.close()
     access_logger.info(f"INPUT: {input_data} - IP: {ip} - THREAT: {threat_detected}")
 
-if __name__ == "__main__":
+if __name__ != "__main__":
     init_db()
-    app.run(debug=True)
+    gunicorn_app = app

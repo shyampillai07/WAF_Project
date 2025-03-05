@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaDatabase, FaCode, FaTerminal, FaFolderOpen, FaTachometerAlt, FaShieldAlt } from "react-icons/fa";
 import "../styles/protectionrules.scss";
-import  API_BASE_URL  from "../config";
+import API_BASE_URL from "../config";
 
 const iconMap = {
   SQLi: <FaDatabase />,
@@ -31,8 +31,7 @@ const ProtectionRules = () => {
         const data = await response.json();
         console.log("✅ Raw API Response:", data);
 
-        // Validate that `data.rules` is an array
-        if (!data || typeof data !== "object" || !Array.isArray(data.rules)) {
+        if (!data || !Array.isArray(data.rules)) {
           throw new Error("Invalid API response format: 'rules' should be an array.");
         }
 
@@ -44,14 +43,14 @@ const ProtectionRules = () => {
         );
       } catch (err) {
         console.error("❌ Error fetching protection rules:", err.message);
-        setError("Failed to load protection rules.");
+        setError(`Failed to load protection rules: ${err.message}`);
       } finally {
         setLoading(false);
       }
     };
 
     fetchRules();
-  }, []);
+  }, []); // Empty dependency array to ensure fetch is called only once
 
   // Toggle Rule
   const toggleRule = async (id, currentStatus) => {
@@ -60,7 +59,7 @@ const ProtectionRules = () => {
     console.log(`🔹 Toggling rule ${id}:`, !currentStatus);
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/protection-rules/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/protection-rules/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ enabled: !currentStatus }),
@@ -68,15 +67,17 @@ const ProtectionRules = () => {
 
       if (!response.ok) throw new Error(`Failed to update rule (Status: ${response.status})`);
 
-      // Update rule state optimistically
+      // Optimistic UI Update
       setRules((prevRules) =>
-        prevRules.map((rule) => (rule.id === id ? { ...rule, enabled: !currentStatus } : rule))
+        prevRules.map((rule) =>
+          rule.id === id ? { ...rule, enabled: !currentStatus } : rule
+        )
       );
 
       console.log(`✅ Rule ${id} updated successfully!`);
     } catch (err) {
       console.error(`❌ Error updating rule ${id}:`, err.message);
-      setError("Failed to update rule. Please try again.");
+      setError(`Failed to update rule: ${err.message}`);
     } finally {
       setUpdatingRuleId(null);
     }

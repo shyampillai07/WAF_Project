@@ -2,27 +2,38 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/home.scss";
 import { FaShieldAlt, FaUser } from "react-icons/fa";
-import API_BASE_URL  from "../config";
+import API_BASE_URL from "../config";
 
 function Home() {
   const [message, setMessage] = useState("Loading...");
 
   useEffect(() => {
-    console.log("✅ Home Component Loaded"); // Debugging
+    console.log("✅ Home Component Loaded");
 
-    fetch(`${API_BASE_URL}/api/home`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        console.log("🔹 API Response:", data); // Debugging
+    if (!API_BASE_URL) {
+      console.error("❌ API_BASE_URL is not defined!");
+      setMessage("Error: API URL is missing.");
+      return;
+    }
+
+    const fetchHomeData = async () => {
+      try {
+        console.log("🔹 Fetching home data...");
+        const response = await fetch(`${API_BASE_URL}/api/home`);
+
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+        const data = await response.json();
+        console.log("✅ API Response:", data);
+
         setMessage(data.message || "Welcome to WAF Dashboard");
-      })
-      .catch((err) => {
-        console.error("❌ Error fetching home data:", err);
-        setMessage("Error: Unable to fetch home data");
-      });
+      } catch (err) {
+        console.error("❌ Error fetching home data:", err.message);
+        setMessage(`Error: ${err.message}`);
+      }
+    };
+
+    fetchHomeData();
   }, []);
 
   return (
