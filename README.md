@@ -1,6 +1,6 @@
 # **Web Application Firewall (WAF) Project** 🛡️  
 
-A **Web Application Firewall (WAF)** built using **Flask**, **SQLite**, and **React**, designed to detect and block common web threats like **SQL Injection, XSS, Command Injection, and LFI/RFI Attacks**.  
+A **Web Application Firewall (WAF)** built using **Flask, SQLite, and React**, designed to detect and block common web threats like **SQL Injection, XSS, Command Injection, and LFI/RFI Attacks**.
 
 ## **🚀 Features**  
 👉 **SQL Injection Protection** – Detects and blocks malicious SQL queries.  
@@ -21,11 +21,11 @@ A **Web Application Firewall (WAF)** built using **Flask**, **SQLite**, and **Re
 - **Deployment**: Render  
 
 ## **💂️ Security Checks Implemented**  
-- **SQL Injection (SQLi)** detection and blocking.  
-- **Cross-Site Scripting (XSS)** prevention.  
-- **Command Injection** filtering.  
-- **Path Traversal & Local File Inclusion (LFI/RFI)** blocking.  
-- **Rate Limiting** to prevent abuse.  
+✅ **SQL Injection (SQLi)** detection and blocking.  
+✅ **Cross-Site Scripting (XSS)** prevention.  
+✅ **Command Injection** filtering.  
+✅ **Path Traversal & Local File Inclusion (LFI/RFI)** blocking.  
+✅ **Rate Limiting** to prevent abuse.  
 
 ## **🖥️ Setup & Installation**  
 ### **1️⃣ Clone the Repository**  
@@ -70,12 +70,20 @@ docker run -p 5000:5000 waf_project
 ```
 
 ## **🌍 Deploy on Render**  
+### **1️⃣ Backend Deployment**  
 1. Push your changes to **GitHub**  
 2. Connect the repository to **Render**  
-3. Use `render.yaml` for automatic deployment  
+3. Set up a **Web Service** for Flask using `render.yaml`  
+
+### **2️⃣ Frontend Deployment**  
+1. Inside the `client/` folder, run:  
+```sh
+npm run build
+```
+2. Upload the `build/` folder to **Render** as a **Static Site**.  
 
 ## **🐝 Contributing**  
 Feel free to fork this repository, create new features, and submit pull requests!  
 
 ## **📚 License**  
-This project is **open-source** under the **MIT License**.  
+This project is **open-source** under the **MIT License**.
