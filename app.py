@@ -8,7 +8,7 @@ import os
 
 # Flask App Initialization
 app = Flask(__name__, static_folder="client/build", static_url_path="/")
-CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "https://your-render-url.com"]}})  # CORS for local & deployed frontend
+CORS(app, resources={r"/api/*": {"origins": "https://waf-project-1.onrender.com"}})  # CORS for local & deployed frontend
 
 # Create Directories
 os.makedirs("logs", exist_ok=True)
