@@ -9,7 +9,7 @@ function Home() {
   useEffect(() => {
     console.log("✅ Home Component Loaded"); // Debugging
 
-    fetch("http://127.0.0.1:5000/api/home")
+    fetch('${API_BASE_URL}/api/home')
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
         return res.json();

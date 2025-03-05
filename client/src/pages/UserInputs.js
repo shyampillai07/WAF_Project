@@ -24,7 +24,7 @@ const UserInput = () => {
 
     try {
       console.log("🔹 Sending request to API...");
-      const res = await fetch("http://127.0.0.1:5000/api/user-input", {
+      const res = await fetch('${API_BASE_URL}/api/user-input', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input }),

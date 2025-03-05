@@ -23,7 +23,7 @@ const ProtectionRules = () => {
     const fetchRules = async () => {
       try {
         console.log("🔹 Fetching protection rules...");
-        const response = await fetch("http://127.0.0.1:5000/api/protection-rules");
+        const response = await fetch('${API_BASE_URL}/api/protection-rules');
 
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
