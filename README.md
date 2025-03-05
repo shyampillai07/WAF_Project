@@ -1,6 +1,6 @@
 # **Web Application Firewall (WAF) Project** 🛡️  
 
-A **Web Application Firewall (WAF)** built using **Flask** and **SQLite**, designed to detect and block common web threats like **SQL Injection, XSS, Command Injection, and LFI/RFI Attacks**.  
+A **Web Application Firewall (WAF)** built using **Flask**, **SQLite**, and **React**, designed to detect and block common web threats like **SQL Injection, XSS, Command Injection, and LFI/RFI Attacks**.  
 
 ## **🚀 Features**  
 👉 **SQL Injection Protection** – Detects and blocks malicious SQL queries.  
@@ -9,9 +9,11 @@ A **Web Application Firewall (WAF)** built using **Flask** and **SQLite**, desig
 👉 **Local/Remote File Inclusion (LFI/RFI) Defense** – Restricts unauthorized file access.  
 👉 **IP Rate Limiting** – Limits repeated requests to prevent DoS attacks.  
 👉 **Logging & Monitoring** – Logs all suspicious activity and user inputs.  
+👉 **Interactive UI** – A modern **React frontend** with real-time logs and analytics.  
 👉 **Docker & Render Deployment** – Easily deployable with Docker and Render.  
 
 ## **🛠️ Tech Stack**  
+- **Frontend**: React, TailwindCSS, ShadCN  
 - **Backend**: Python (Flask)  
 - **Database**: SQLite  
 - **Web Server**: Gunicorn  
@@ -25,21 +27,6 @@ A **Web Application Firewall (WAF)** built using **Flask** and **SQLite**, desig
 - **Path Traversal & Local File Inclusion (LFI/RFI)** blocking.  
 - **Rate Limiting** to prevent abuse.  
 
-## **📂 Project Structure**  
-```
-WAF_Project/
-│── database/             # SQLite database for logging attacks
-│── logs/                 # Stores application and access logs
-│── static/               # Static assets (CSS, JS, images)
-│── templates/            # HTML templates
-│── app.py                # Main Flask application
-│── gunicorn_config.py    # Gunicorn server configuration
-│── Dockerfile            # Docker setup for containerization
-│── render.yaml           # Render deployment configuration
-│── requirements.txt      # Python dependencies
-│── README.md             # Project documentation
-```
-
 ## **🖥️ Setup & Installation**  
 ### **1️⃣ Clone the Repository**  
 ```sh
@@ -47,16 +34,29 @@ git clone https://github.com/yourusername/WAF_Project.git
 cd WAF_Project
 ```
 
-### **2️⃣ Install Dependencies**  
+### **2️⃣ Install Backend Dependencies**  
 ```sh
 pip install -r requirements.txt
 ```
 
-### **3️⃣ Run the Application**  
+### **3️⃣ Install Frontend Dependencies**  
+```sh
+cd client
+npm install
+```
+
+### **4️⃣ Run the Backend**  
 ```sh
 python app.py
 ```
-The app will run at **http://127.0.0.1:5000**.
+The backend will run at **http://127.0.0.1:5000**.
+
+### **5️⃣ Run the Frontend**  
+```sh
+cd client
+npm start
+```
+The frontend will run at **http://localhost:3000**.
 
 ## **🐳 Deploy with Docker**  
 ### **1️⃣ Build the Docker Image**  

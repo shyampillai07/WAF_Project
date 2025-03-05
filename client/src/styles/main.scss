@@ -1,0 +1,113 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Top Navigation Bar */
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background-color: #333;
+  color: white;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+}
+
+.menu-btn:hover {
+  transform: scale(1.1);
+}
+
+.brand {
+  text-decoration: none;
+  color:#fafaf9;
+  font-size: 22px;
+  font-weight: 500;
+  font-family: 'interroboto', sans-serif;
+}
+
+/* Main Layout */
+.main-layout {
+  display: flex;
+  flex: 1;
+  transition: margin-left 0.4s ease-in-out;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #222;
+  color: white;
+  transition: transform 0.4s ease-in-out;
+  transform: translateX(0);
+  position: fixed;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+
+/* Sidebar Navigation */
+.sidebar nav {
+  padding: 10px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  font-family: 'interroboto', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.sidebar ul li a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: white;
+  width: 100%;
+  transition: color 0.3s ease-in-out;
+}
+
+.sidebar ul li a:hover {
+  color: #6b7280;
+}
+
+/* Sidebar Icons */
+.icon {
+  font-size: 22px;
+  min-width: 22px;
+  margin-right: 15px;
+}
+
+/* Content Area Adjustments */
+.content {
+  flex-grow: 1;
+  padding: 20px;
+  margin-left: 250px;
+  transition: margin-left 0.4s ease-in-out;
+}
+
+.main-layout.sidebar-closed .content {
+  margin-left: 0;
+  width: 100%;
+}

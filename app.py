@@ -1,60 +1,19 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, jsonify ,send_from_directory
+from flask_cors import CORS
 import re
 import sqlite3
 import time
 import logging
 import os
 
-app = Flask(__name__, static_folder="static")
+app = Flask(__name__, static_folder="client/build", static_url_path="/")
+CORS(app, resources={r"/*": {"origins": "*"}})
 
-# Ensure logs directory exists
+# Create Directories
 os.makedirs("logs", exist_ok=True)
+os.makedirs("database", exist_ok=True)
 
-# Setup Access Logging
-access_logger = logging.getLogger("access")
-access_handler = logging.FileHandler("logs/access.log")
-access_formatter = logging.Formatter("%(asctime)s - INPUT: %(message)s - IP: %(ip)s - THREAT: %(threat)s")
-access_handler.setFormatter(access_formatter)
-access_logger.addHandler(access_handler)
-access_logger.setLevel(logging.INFO)
-
-# Setup Error Logging
-error_logger = logging.getLogger("error")
-error_handler = logging.FileHandler("logs/error.log")
-error_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
-error_logger.addHandler(error_handler)
-error_logger.setLevel(logging.ERROR)
-
-# 🚨 SECURITY PATTERNS 🚨
-SQLI_PATTERNS = [
-    r"(\%27)|(\')|(\-\-)|(%23)|(#)",  # Basic SQL Injection
-    r"\b(SELECT|INSERT|DELETE|UPDATE|DROP|UNION|TRUNCATE|ALTER|EXEC|REPLACE|MERGE)\b",  # SQL Keywords
-    r"(\bOR\b|\bAND\b).*(=|LIKE|IN).*(['\"0-9])",  # OR/AND-based SQLi
-    r"(\/\*.*?\*\/)"  # SQL Comment Injection
-]
-
-XSS_PATTERNS = [
-    r"(?i)<script.*?>.*?</script.*?>",  # Basic XSS
-    r"(?i)javascript:.*",  # Inline JavaScript
-    r"(?i)on\w+=.*",  # Event Handlers (onerror, onclick, etc.)
-    r"(?i)(alert|confirm|prompt|eval).*?"  # JavaScript Functions
-]
-
-CMD_INJECTION_PATTERNS = [
-    r"(\||;|&&|\$|\`)",  # Command Separators
-    r"\b(rm|wget|curl|nc|netcat|bash|sh|python|perl|php|awk)\b"  # Dangerous Commands
-]
-
-LFI_RFI_PATTERNS = [
-    r"(\.\./|\.\.\\)",  # Directory Traversal
-    r"(\/etc\/passwd|\/proc\/self\/cmdline)",  # Accessing System Files
-    r"https?:\/\/.*?\.[a-z]{2,6}\/.*"  # Remote File Inclusion (RFI)
-]
-
-BLOCKED_IPS = []
-REQUEST_LOGS = {}
-
-# 📌 Initialize Database
+# Initialize Database
 def init_db():
     conn = sqlite3.connect("database/waf_logs.db")
     cursor = conn.cursor()
@@ -70,102 +29,100 @@ def init_db():
     conn.commit()
     conn.close()
 
-# 🏠 Home Route
-@app.route("/")
+# Logging Configuration
+log_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+
+def setup_logger(name, log_file):
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.INFO)
+    
+    if not logger.handlers:
+        handler = logging.FileHandler(log_file)
+        handler.setFormatter(log_formatter)
+        logger.addHandler(handler)
+    
+    return logger
+
+access_logger = setup_logger("access", "logs/access.log")
+error_logger = setup_logger("error", "logs/error.log")
+
+# Security Rules
+SECURITY_RULES = {
+    "SQLi": [r"(\%27)|(\')|(\-\-)|(%23)|(#)", r"(?i)\b(SELECT|INSERT|DELETE|UPDATE|DROP|UNION|TRUNCATE|ALTER|EXEC|REPLACE|MERGE)\s"],
+    "XSS": [r"(?i)<script.*?>.*?</script.*?>", r"(?i)javascript:.*"],
+    "Command Injection": [r"(\||;|&&|\$|\`)", r"\b(rm|wget|curl|nc|netcat|bash|sh|python|perl|php|awk)\b"],
+    "Path Traversal": [r"(\.\./|\.\.\\)", r"(/etc/passwd|/proc/self/cmdline)", r"https?:\/\/.*?\.[a-z]{2,6}\/.*"]
+}
+
+protection_rules = [
+    {"id": 1, "name": "SQLi", "description": "Detects SQL injection", "enabled": True},
+    {"id": 2, "name": "XSS", "description": "Detects cross-site scripting", "enabled": True},
+    {"id": 3, "name": "Command Injection", "description": "Prevents OS command execution", "enabled": True},
+    {"id": 4, "name": "Path Traversal", "description": "Blocks unauthorized file access", "enabled": True},
+    {"id": 5, "name": "Rate Limiting", "description": "Limits excessive requests", "enabled": True}
+]
+
+# API Endpoints
+@app.route('/api/home', methods=['GET'])
 def home():
-    return render_template("index.html") 
+    return jsonify({"message": "Welcome to the Web Application Firewall!"})
 
-#log Html Route
-@app.route("/logs")
-def logs():
-    conn = sqlite3.connect("database/waf_logs.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM logs ORDER BY id DESC")
-    logs = cursor.fetchall()
-    conn.close()
-    return render_template("logs.html", logs=logs)
+@app.route("/api/protection-rules", methods=["GET"])
+def get_protection_rules():
+    return jsonify({"rules": protection_rules})
 
-#Error Html Route
-@app.route("/error")
-def error():
-    with open("logs/error.log", "r") as f:
-        error_logs = f.read()
-    return render_template("error.html", error_logs=error_logs)
+@app.route("/api/protection-rules/<int:rule_id>", methods=["PATCH"])
+def update_protection_rule(rule_id):
+    data = request.get_json()
+    for rule in protection_rules:
+        if rule["id"] == rule_id:
+            rule["enabled"] = data.get("enabled", rule["enabled"])
+            return jsonify({"message": "Rule updated successfully.", "rule": rule}), 200
+    return jsonify({"error": "Rule not found"}), 404
 
-# 🔍 WAF Security Check
-@app.route("/check", methods=["GET"])
-def waf():
-    user_ip = request.remote_addr
-    user_input = request.args.get("input", "")
+@app.route("/api/user-input", methods=["POST"])
+def user_input():
+    data = request.json
+    user_input = data.get("input", "")
 
-    app.logger.info(f"Received Input: {user_input}")
+    if not user_input.strip():
+        return jsonify({"error": "Empty input received"}), 400
 
-    # 🚦 Rate Limiting - Prevent Too Many Requests
-    if is_rate_limited(user_ip):
-        return jsonify({"error": "Too many requests. IP temporarily blocked."}), 403
-
-    # 🚫 Blocked IP Check
-    if user_ip in BLOCKED_IPS:
-        return jsonify({"error": "Access Denied - IP Blocked"}), 403
-
-    # 🔍 Check for security threats
     threat_type = detect_attack(user_input)
     if threat_type:
-        log_attack(user_ip, user_input, threat_type)
+        log_attack(request.remote_addr, user_input, threat_type)
         return jsonify({"error": f"Blocked by WAF: {threat_type}"}), 403
 
     return jsonify({"message": "Safe Request"}), 200
 
-# 🚦 Rate Limiting Check
-def is_rate_limited(user_ip):
-    current_time = time.time()
-    if user_ip in REQUEST_LOGS:
-        if len(REQUEST_LOGS[user_ip]) >= 5:  # More than 5 requests in 10 sec?
-            if current_time - REQUEST_LOGS[user_ip][0] < 10:
-                BLOCKED_IPS.append(user_ip)
-                return True
-        REQUEST_LOGS[user_ip].append(current_time)
-    else:
-        REQUEST_LOGS[user_ip] = [current_time]
-    return False
+@app.route("/")
+@app.route("/<path:path>")
+def serve_frontend(path="index.html"):
+    return send_from_directory("client/build", path)
 
-# 🔎 Detect Attack Type (SQLi / XSS / RCE / LFI-RFI)
+# WAF Functions
 def detect_attack(input_data):
-    for pattern in SQLI_PATTERNS:
-        if re.search(pattern, input_data, re.IGNORECASE):
-            return "SQL Injection"
+    for rule in protection_rules:
+        if rule["enabled"]:
+            for pattern in SECURITY_RULES.get(rule["name"], []):
+                try:
+                    if re.search(pattern, input_data, re.IGNORECASE):
+                        return rule["name"]
+                except re.error as e:
+                    error_logger.error(f"Invalid regex pattern: {pattern} -> {e}")
+                    continue
+    return None
 
-    for pattern in XSS_PATTERNS:
-        if re.search(pattern, input_data, re.IGNORECASE):
-            return "XSS Attack"
-
-    for pattern in CMD_INJECTION_PATTERNS:
-        if re.search(pattern, input_data, re.IGNORECASE):
-            return "Command Injection"
-
-    for pattern in LFI_RFI_PATTERNS:
-        if re.search(pattern, input_data, re.IGNORECASE):
-            return "Path Traversal / LFI-RFI Attack"
-
-    return None  # No threat detected
-
-# 📌 Log Attacks in Database & Access Log
 def log_attack(ip, input_data, threat_detected):
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
     conn = sqlite3.connect("database/waf_logs.db")
     cursor = conn.cursor()
     cursor.execute("INSERT INTO logs (ip, input, threat, timestamp) VALUES (?, ?, ?, ?)",
-                   (ip, input_data, threat_detected, time.strftime("%Y-%m-%d %H:%M:%S")))
+                   (ip, input_data, threat_detected, timestamp))
     conn.commit()
     conn.close()
+    access_logger.info(f"INPUT: {input_data} - IP: {ip} - THREAT: {threat_detected}")
 
-    log_message = f"INPUT: {input_data}"
-    access_logger.info(log_message, extra={"ip": ip, "threat": threat_detected})
-
-# 📌 Log Errors
-def log_error(error_message):
-    error_logger.error(error_message)
-
-# 🚀 Run the Application
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)

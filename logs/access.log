@@ -1,3 +1,20 @@
 2025-02-26 13:17:25,635 - INPUT: INPUT: 'OR'1'='1' - IP: 127.0.0.1 - THREAT: SQL Injection
 2025-02-26 13:35:23,291 - INPUT: INPUT: 'OR'1'='1' - IP: 127.0.0.1 - THREAT: SQL Injection
 2025-02-26 13:35:40,608 - INPUT: INPUT: 'OR'1'='1' - IP: 127.0.0.1 - THREAT: SQL Injection
+2025-03-03 21:58:23,720 - INFO - INPUT: <script>alert(1)</script> - IP: 127.0.0.1 - THREAT: XSS
+2025-03-03 22:03:21,164 - INFO - INPUT: <script>alert(1)</script> - IP: 127.0.0.1 - THREAT: XSS
+2025-03-03 22:29:16,716 - INFO - INPUT: <script>alert(1)</script> - IP: 127.0.0.1 - THREAT: XSS
+2025-03-03 22:32:53,932 - INFO - INPUT: 'OR'1'='1' - IP: 127.0.0.1 - THREAT: SQLi
+2025-03-03 22:35:17,464 - INFO - INPUT: 'OR'1'='1' - IP: 127.0.0.1 - THREAT: SQLi
+2025-03-03 22:38:47,024 - INFO - INPUT: 'OR'1'='1' - IP: 127.0.0.1 - THREAT: SQLi
+2025-03-03 23:05:25,836 - INFO - INPUT: 'OR'1'='1' - IP: 127.0.0.1 - THREAT: SQLi
+2025-03-04 19:27:42,443 - INFO - INPUT: !@#$%& - IP: 127.0.0.1 - THREAT: SQLi
+2025-03-04 19:28:01,332 - INFO - INPUT: 'OR'1'='1' - IP: 127.0.0.1 - THREAT: SQLi
+2025-03-05 19:03:29,258 - INFO - INPUT: 'OR'1'='1' - IP: 127.0.0.1 - THREAT: SQLi
+2025-03-05 19:29:25,960 - INFO - INPUT: !@#$%&* - IP: 127.0.0.1 - THREAT: SQLi
+2025-03-05 19:57:02,529 - INFO - INPUT: ' OR 1=1 -- - IP: 127.0.0.1 - THREAT: SQLi
+2025-03-05 19:57:23,267 - INFO - INPUT: <script>alert('XSS Attack!')</script> - IP: 127.0.0.1 - THREAT: SQLi
+2025-03-05 19:57:53,827 - INFO - INPUT: ; rm -rf / - IP: 127.0.0.1 - THREAT: Command Injection
+2025-03-05 19:58:01,146 - INFO - INPUT: ../../etc/passwd - IP: 127.0.0.1 - THREAT: Path Traversal
+2025-03-05 19:58:07,352 - INFO - INPUT: http://malicious-site.com/shell.php - IP: 127.0.0.1 - THREAT: Command Injection
+2025-03-05 19:58:24,248 - INFO - INPUT: ../secret-files/config.json - IP: 127.0.0.1 - THREAT: Path Traversal

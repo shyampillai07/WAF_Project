@@ -1,0 +1,89 @@
+.home-container {
+  font-family: 'interroboto', sans-serif;
+  cursor: default;
+  flex: 1;
+  padding: 30px;
+  text-align: center;
+  background-color: #fff; // White background
+  color: #333; // Darker text for contrast
+
+  /* Welcome Message Styling */
+  .home-header {
+    margin-bottom: 20px;
+
+    .welcome-title {
+      font-size: 32px;
+      font-weight: bold;
+      color: #222; // Darker color for visibility
+      margin-bottom: 5px;
+    }
+
+    .welcome-subtitle {
+      font-size: 18px;
+      color: #555; // Slightly lighter but still visible
+      margin-bottom: 15px;
+    }
+  }
+
+  /* Monitor and Control Section */
+  .home-monitor {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 30px;
+    font-style: italic;
+  }
+
+  /* Dashboard Cards */
+  .home-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 10px;
+
+    .home-card {
+      background: #f9f9f9; // Light grey for better separation
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      transition: transform 0.3s ease-in-out;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        transform: scale(1.05);
+      }
+
+      .home-icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+        color: #000000;
+      }
+
+      h3 {
+        font-size: 20px;
+        color: #222; // Dark text
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 15px;
+      }
+
+      .home-button {
+        display: inline-block;
+        padding: 8px 12px;
+        background: #d1d5db;
+        color: #000;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: background 0.3s ease-in-out;
+
+        &:hover {
+          background: #6b7280;
+        }
+      }
+    }
+  }
+}

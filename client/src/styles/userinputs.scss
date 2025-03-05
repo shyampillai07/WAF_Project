@@ -1,0 +1,91 @@
+.userinputs-container {
+  font-family: 'interroboto', sans-serif;
+  cursor: default;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 85vh;
+  background: #f4f4f4;
+  border-radius: 15px;
+}
+
+.user-input-box {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 24px;
+  color: #222;
+  margin-bottom: 20px;
+}
+
+.user-input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center; /* Ensures all elements align properly */
+  width: 100%;
+
+  label {
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    align-self: flex-start; /* Aligns label to the left */
+  }
+
+  input {
+    width: 100%; /* Makes input field full width */
+    max-width: 450px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    transition: border 0.3s ease-in-out;
+
+    &:focus {
+      border-color: #334155;
+      outline: none;
+    }
+  }
+
+  .submit-btn {
+    width: 50%;
+    max-width: 350px;
+        background: #d1d5db;
+    color: #000;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    text-align: center;
+
+    &:hover {
+          background: #6b7280;
+    }
+  }
+
+  .error-message {
+    color: red;
+    font-size: 14px;
+    text-align: center;
+
+  }
+  .success-message {
+  color: green;
+  font-weight: bold;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+}
+}
