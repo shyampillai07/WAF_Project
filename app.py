@@ -20,11 +20,13 @@ limiter = Limiter(
     default_limits=["5 per minute"]
 )
 
+# Create Directories
+os.makedirs("logs", exist_ok=True)
+
 # PostgreSQL Database Connection
 DATABASE_URL = os.getenv("DATABASE_URL")  # Get PostgreSQL URL from Render
 
 if DATABASE_URL:
-    urllib.parse.uses_netloc.append("postgres")
     url = urllib.parse.urlparse(DATABASE_URL)
     DB_CONFIG = {
         "dbname": url.path[1:],
@@ -55,6 +57,7 @@ def init_db():
             )
         """)
         conn.commit()
+        cursor.close()
         conn.close()
         print("Database initialized successfully.")
     except Exception as e:
