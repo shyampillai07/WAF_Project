@@ -24,7 +24,7 @@ os.makedirs("logs", exist_ok=True)
 os.makedirs("opt/render/database", exist_ok=True)  # Fixed directory path
 
 # Database Path (Render uses /data for persistence)
-DB_PATH = os.environ.get("DATABASE_URL", "sqlite:////data/waf_logs.db")  
+DB_PATH = os.environ.get("DATABASE_URL", "sqlite:////opt/render/database/waf_logs.db")  
 
 # Initialize Database
 def init_db():
