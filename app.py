@@ -6,7 +6,6 @@ import re
 import os
 import time
 import logging
-import json
 
 # Flask App Initialization
 app = Flask(__name__, static_folder="client/build", static_url_path="/")
@@ -21,14 +20,6 @@ limiter = Limiter(
 
 # Create Directories
 os.makedirs("logs", exist_ok=True)
-
-# JSON Log File
-LOG_FILE = "logs/waf_logs.json"
-
-# Ensure the JSON log file exists
-if not os.path.exists(LOG_FILE):
-    with open(LOG_FILE, "w") as f:
-        json.dump([], f)
 
 # Logging Configuration
 log_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
@@ -96,17 +87,6 @@ def user_input():
 
     return jsonify({"message": "Safe Request"}), 200
 
-@app.route("/api/logs", methods=["GET"])
-def get_logs():
-    """Endpoint to fetch stored logs from the JSON file."""
-    try:
-        with open(LOG_FILE, "r") as f:
-            logs = json.load(f)
-        return jsonify({"logs": logs}), 200
-    except Exception as e:
-        error_logger.error(f"Error reading logs: {e}")
-        return jsonify({"error": "Failed to retrieve logs"}), 500
-
 # Serve Frontend (React App)
 @app.route("/")
 @app.route("/<path:path>")
@@ -129,34 +109,11 @@ def detect_attack(input_data):
                     continue
     return None
 
-# Logging Function (Using JSON)
+# Logging Function (Without Database)
 def log_attack(ip, input_data, threat_detected):
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-
-    # Create a log entry
-    log_entry = {
-        "timestamp": timestamp,
-        "ip": ip,
-        "input": input_data,
-        "threat": threat_detected
-    }
-
-    # Read existing logs from JSON file
-    try:
-        with open(LOG_FILE, "r") as f:
-            logs = json.load(f)
-    except json.JSONDecodeError:
-        logs = []  # If the file is empty or corrupted, reset logs
-
-    # Append new log entry
-    logs.append(log_entry)
-
-    # Write updated logs back to JSON file
-    with open(LOG_FILE, "w") as f:
-        json.dump(logs, f, indent=4)
-
-    # Log to access log file
     access_logger.info(f"INPUT: {input_data} - IP: {ip} - THREAT: {threat_detected}")
 
 if __name__ != "__main__":
+    
     gunicorn_app = app
