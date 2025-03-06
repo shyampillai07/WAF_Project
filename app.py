@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import re
 import sqlite3
 import time
@@ -8,30 +10,40 @@ import os
 
 # Flask App Initialization
 app = Flask(__name__, static_folder="client/build", static_url_path="/")
-CORS(app, resources={r"/api/*": {"origins": "https://waf-project-1.onrender.com"}})  # CORS for local & deployed frontend
+CORS(app, resources={r"/api/*": {"origins": "https://waf-project-1.onrender.com"}})
+
+# Initialize Rate Limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["5 per minute"]
+)
 
 # Create Directories
-os.makedirs("logs", exist_ok=True)
-os.makedirs("/opt/render/database", exist_ok=True)
+os.makedirs("logs", exist_ok=True)  
+os.makedirs("opt/render/database", exist_ok=True)  # Fixed directory path
 
-# Database Path (Ensure persistence in Render)
-DB_PATH = os.environ.get("DATABASE_URL", "sqlite:////opt/render/database/waf_logs.db")
+# Database Path (Render uses /data for persistence)
+DB_PATH = os.environ.get("DATABASE_URL", "sqlite:////data/waf_logs.db")  
 
 # Initialize Database
 def init_db():
-    conn = sqlite3.connect(DB_PATH.replace("sqlite:///", ""))
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            ip TEXT,
-            input TEXT,
-            threat TEXT,
-            timestamp TEXT
-        )
-    """)
-    conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect(DB_PATH.replace("sqlite:///", ""))
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ip TEXT,
+                input TEXT,
+                threat TEXT,
+                timestamp TEXT
+            )
+        """)
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"Database Initialization Error: {e}")
 
 # Logging Configuration
 log_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
@@ -39,12 +51,10 @@ log_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 def setup_logger(name, log_file):
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
-
     if not logger.handlers:
         handler = logging.FileHandler(log_file)
         handler.setFormatter(log_formatter)
         logger.addHandler(handler)
-
     return logger
 
 access_logger = setup_logger("access", "logs/access.log")
@@ -68,6 +78,7 @@ protection_rules = [
 
 # API Endpoints
 @app.route('/api/home', methods=['GET'])
+@limiter.limit("5 per minute")
 def home():
     return jsonify({"message": "Welcome to the Web Application Firewall!"})
 
@@ -85,6 +96,7 @@ def update_protection_rule(rule_id):
     return jsonify({"error": "Rule not found"}), 404
 
 @app.route("/api/user-input", methods=["POST"])
+@limiter.limit("5 per minute")
 def user_input():
     data = request.json
     user_input = data.get("input", "")
@@ -103,7 +115,10 @@ def user_input():
 @app.route("/")
 @app.route("/<path:path>")
 def serve_frontend(path="index.html"):
-    return send_from_directory(app.static_folder, path)
+    try:
+        return send_from_directory(app.static_folder, path)
+    except Exception:
+        return send_from_directory(app.static_folder, "index.html")
 
 # WAF Functions
 def detect_attack(input_data):
@@ -120,12 +135,16 @@ def detect_attack(input_data):
 
 def log_attack(ip, input_data, threat_detected):
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    conn = sqlite3.connect(DB_PATH.replace("sqlite:///", ""))
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO logs (ip, input, threat, timestamp) VALUES (?, ?, ?, ?)",
-                   (ip, input_data, threat_detected, timestamp))
-    conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect(DB_PATH.replace("sqlite:///", ""))
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO logs (ip, input, threat, timestamp) VALUES (?, ?, ?, ?)",
+                       (ip, input_data, threat_detected, timestamp))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        error_logger.error(f"Database Logging Error: {e}")
+
     access_logger.info(f"INPUT: {input_data} - IP: {ip} - THREAT: {threat_detected}")
 
 if __name__ != "__main__":
