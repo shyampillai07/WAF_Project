@@ -3,7 +3,8 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import re
-import sqlite3
+import psycopg2
+import urllib.parse
 import time
 import logging
 import os
@@ -19,21 +20,34 @@ limiter = Limiter(
     default_limits=["5 per minute"]
 )
 
-# Create Directories
-os.makedirs("logs", exist_ok=True)  
-os.makedirs("opt/render/database", exist_ok=True)  # Fixed directory path
+# PostgreSQL Database Connection
+DATABASE_URL = os.getenv("DATABASE_URL")  # Get PostgreSQL URL from Render
 
-# Database Path (Render uses /data for persistence)
-DB_PATH = os.environ.get("DATABASE_URL", "sqlite:////opt/render/database/waf_logs.db")  
+if DATABASE_URL:
+    urllib.parse.uses_netloc.append("postgres")
+    url = urllib.parse.urlparse(DATABASE_URL)
+    DB_CONFIG = {
+        "dbname": url.path[1:],
+        "user": url.username,
+        "password": url.password,
+        "host": url.hostname,
+        "port": url.port
+    }
+else:
+    DB_CONFIG = None
 
 # Initialize Database
 def init_db():
+    if not DB_CONFIG:
+        print("No database URL found. Using default SQLite.")
+        return
+    
     try:
-        conn = sqlite3.connect(DB_PATH.replace("sqlite:///", ""))
+        conn = psycopg2.connect(**DB_CONFIG)
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS logs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 ip TEXT,
                 input TEXT,
                 threat TEXT,
@@ -42,6 +56,7 @@ def init_db():
         """)
         conn.commit()
         conn.close()
+        print("Database initialized successfully.")
     except Exception as e:
         print(f"Database Initialization Error: {e}")
 
@@ -135,11 +150,17 @@ def detect_attack(input_data):
 
 def log_attack(ip, input_data, threat_detected):
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    if not DB_CONFIG:
+        return
+
     try:
-        conn = sqlite3.connect(DB_PATH.replace("sqlite:///", ""))
+        conn = psycopg2.connect(**DB_CONFIG)
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO logs (ip, input, threat, timestamp) VALUES (?, ?, ?, ?)",
-                       (ip, input_data, threat_detected, timestamp))
+        cursor.execute(
+            "INSERT INTO logs (ip, input, threat, timestamp) VALUES (%s, %s, %s, %s)",
+            (ip, input_data, threat_detected, timestamp),
+        )
         conn.commit()
         conn.close()
     except Exception as e:

@@ -2,3 +2,4 @@ flask
 flask-cors
 gunicorn
 flask-limiter
+psycopg2-binary
