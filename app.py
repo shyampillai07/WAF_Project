@@ -2,12 +2,11 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_sqlalchemy import SQLAlchemy
 import re
-import psycopg2
-import urllib.parse
+import os
 import time
 import logging
-import os
 
 # Flask App Initialization
 app = Flask(__name__, static_folder="client/build", static_url_path="/")
@@ -24,44 +23,32 @@ limiter = Limiter(
 os.makedirs("logs", exist_ok=True)
 
 # PostgreSQL Database Connection
-DATABASE_URL = os.getenv("DATABASE_URL")  # Get PostgreSQL URL from Render
+DATABASE_URL = os.getenv("DATABASE_URL")  
 
 if DATABASE_URL:
-    url = urllib.parse.urlparse(DATABASE_URL)
-    DB_CONFIG = {
-        "dbname": url.path[1:],
-        "user": url.username,
-        "password": url.password,
-        "host": url.hostname,
-        "port": url.port
-    }
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    db = SQLAlchemy(app)
 else:
-    DB_CONFIG = None
+    db = None
+
+# Database Model
+class Log(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(50), nullable=False)
+    input = db.Column(db.Text, nullable=False)
+    threat = db.Column(db.String(100), nullable=False)
+    timestamp = db.Column(db.String(50), nullable=False)
 
 # Initialize Database
 def init_db():
-    if not DB_CONFIG:
-        print("No database URL found. Using default SQLite.")
+    if db is None:
+        print("No database URL found. Skipping DB initialization.")
         return
-    
-    try:
-        conn = psycopg2.connect(**DB_CONFIG)
-        cursor = conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS logs (
-                id SERIAL PRIMARY KEY,
-                ip TEXT,
-                input TEXT,
-                threat TEXT,
-                timestamp TEXT
-            )
-        """)
-        conn.commit()
-        cursor.close()
-        conn.close()
+
+    with app.app_context():
+        db.create_all()
         print("Database initialized successfully.")
-    except Exception as e:
-        print(f"Database Initialization Error: {e}")
 
 # Logging Configuration
 log_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
@@ -151,26 +138,24 @@ def detect_attack(input_data):
                     continue
     return None
 
+# Logging Function (Updated for SQLAlchemy)
 def log_attack(ip, input_data, threat_detected):
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-    if not DB_CONFIG:
+    if db is None:
         return
 
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO logs (ip, input, threat, timestamp) VALUES (%s, %s, %s, %s)",
-            (ip, input_data, threat_detected, timestamp),
-        )
-        conn.commit()
-        conn.close()
+        new_log = Log(ip=ip, input=input_data, threat=threat_detected, timestamp=timestamp)
+        db.session.add(new_log)
+        db.session.commit()
     except Exception as e:
         error_logger.error(f"Database Logging Error: {e}")
+        db.session.rollback()
 
     access_logger.info(f"INPUT: {input_data} - IP: {ip} - THREAT: {threat_detected}")
 
+# Ensure DB is initialized when the app starts
 if __name__ != "__main__":
     init_db()
     gunicorn_app = app
