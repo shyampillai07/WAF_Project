@@ -1,10 +1,6 @@
----
-
 # **Web Application Firewall (WAF) Project** 🛡️  
 
 A **Web Application Firewall (WAF)** built using **Flask, MongoDB, and React**, designed to detect and block common web threats such as **SQL Injection, XSS, Command Injection, and LFI/RFI Attacks**.  
-
----
 
 ## **🚀 Features**  
 
@@ -17,8 +13,6 @@ A **Web Application Firewall (WAF)** built using **Flask, MongoDB, and React**, 
 ✔ **Interactive UI** – A **React-based frontend** with real-time logs & analytics.  
 ✔ **Docker & Render Deployment** – Easily deployable using **Docker & Render**.  
 
----
-
 ## **🛠️ Tech Stack**  
 
 | **Category**    | **Technology**         |
@@ -29,8 +23,6 @@ A **Web Application Firewall (WAF)** built using **Flask, MongoDB, and React**, 
 | **Web Server** | Gunicorn               |
 | **Deployment** | Docker, Render         |
 
----
-
 ## **💂 Security Checks Implemented**  
 
 ✅ **SQL Injection (SQLi)** detection and blocking.  
@@ -38,8 +30,6 @@ A **Web Application Firewall (WAF)** built using **Flask, MongoDB, and React**, 
 ✅ **Command Injection** filtering.  
 ✅ **Path Traversal & Local File Inclusion (LFI/RFI)** blocking.  
 ✅ **Rate Limiting** to prevent abuse and DoS attacks.  
-
----
 
 ## **🖥️ Setup & Installation**  
 
@@ -81,8 +71,6 @@ npm start
 ```
 The frontend will run at **http://localhost:3000**.  
 
----
-
 ## **🐳 Deploy with Docker**  
 
 ### **1️⃣ Build the Docker Image**  
@@ -94,8 +82,6 @@ docker build -t waf_project .
 ```sh
 docker run -p 5000:5000 --env-file .env waf_project
 ```
-
----
 
 ## **🌍 Deploy on Render**  
 
@@ -111,14 +97,8 @@ docker run -p 5000:5000 --env-file .env waf_project
    ```
 2. Upload the `build/` folder to **Render** as a **Static Site**.  
 
----
-
 ## **🐝 Contributing**  
 Contributions are welcome! Feel free to **fork** this repository, create new features, and submit **pull requests**.  
 
----
-
 ## **📚 License**  
 This project is open-source under the **MIT License**.  
-
----
