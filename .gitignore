@@ -22,16 +22,11 @@ Dockerfile
 config.json
 secrets.json
 
-# Ignore logs
-logs/
+# Ignore all log files
 *.log
 
-# Ignore all js files inside database folder
-database/*.js
-
-# Ignore everything inside the database folder
+# Ignore the entire database folder (adjust if needed)
 database/
 
 # Ignore dependencies
 node_modules/
-
