@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from pymongo import MongoClient
+from dotenv import load_dotenv
 import os
 import time
 import logging
@@ -13,7 +14,10 @@ app = Flask(__name__, static_folder="client/build", static_url_path="/")
 CORS(app, resources={r"/api/*": {"origins": "https://waf-project-1.onrender.com"}})
 
 # MongoDB Atlas Connection
+load_dotenv()
 MONGO_URI = os.environ.get("MONGO_URI")
+print(f"MongoDB URI: {MONGO_URI}")
+
 if not MONGO_URI:
     raise ValueError("MongoDB URI is not set")
 

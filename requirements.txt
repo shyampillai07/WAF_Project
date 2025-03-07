@@ -4,3 +4,4 @@ gunicorn
 flask-limiter
 pymongo
 dnspython
+python-dotenv
