@@ -2,6 +2,6 @@ flask
 flask-cors
 gunicorn
 flask-limiter
-pymongo
+pymongo[srv]==4.6.1
 dnspython
 python-dotenv
