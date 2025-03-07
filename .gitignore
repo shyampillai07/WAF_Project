@@ -26,7 +26,11 @@ secrets.json
 logs/
 *.log
 
-# Ignore database files
+# Ignore all js files inside database folder
+database/*.js
+
+# Ignore everything inside the database folder
+database/
 
 # Ignore dependencies
 node_modules/
