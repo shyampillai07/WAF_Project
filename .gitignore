@@ -4,11 +4,6 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Ignore logs and database files
-logs/
-*.log
-database/waf_logs.db
-
 # Ignore virtual environment files
 venv/
 env/
@@ -20,3 +15,19 @@ Thumbs.db
 # Ignore deployment files
 *.render.yaml.swp
 Dockerfile
+
+# Ignore local development files
+.env
+*.env
+config.json
+secrets.json
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore database files
+
+# Ignore dependencies
+node_modules/
+
