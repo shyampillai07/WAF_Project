@@ -2,39 +2,28 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-import re
+from pymongo import MongoClient
 import os
 import time
 import logging
+import re
 
 # Flask App Initialization
 app = Flask(__name__, static_folder="client/build", static_url_path="/")
 CORS(app, resources={r"/api/*": {"origins": "https://waf-project-1.onrender.com"}})
 
+# MongoDB Atlas Connection
+MONGO_URI = os.environ.get("MONGO_URI")
+if not MONGO_URI:
+    raise ValueError("MongoDB URI is not set")
+
+client = MongoClient(MONGO_URI)
+db = client.waf_db  # Database name
+logs_collection = db.logs  # Collection for storing logs
+rules_collection = db.protection_rules  # Collection for storing rules
+
 # Initialize Rate Limiter
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=["5 per minute"]
-)
-
-# Create Directories
-os.makedirs("logs", exist_ok=True)
-
-# Logging Configuration
-log_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-
-def setup_logger(name, log_file):
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
-    if not logger.handlers:
-        handler = logging.FileHandler(log_file)
-        handler.setFormatter(log_formatter)
-        logger.addHandler(handler)
-    return logger
-
-access_logger = setup_logger("access", "logs/access.log")
-error_logger = setup_logger("error", "logs/error.log")
+limiter = Limiter(get_remote_address, app=app, default_limits=["5 per minute"])
 
 # Security Rules
 SECURITY_RULES = {
@@ -44,16 +33,26 @@ SECURITY_RULES = {
     "Path Traversal": [r"(\.\./|\.\.\\)", r"(/etc/passwd|/proc/self/cmdline)", r"https?:\/\/.*?\.[a-z]{2,6}\/.*"]
 }
 
-protection_rules = [
-    {"id": 1, "name": "SQLi", "description": "Detects SQL injection", "enabled": True},
-    {"id": 2, "name": "XSS", "description": "Detects cross-site scripting", "enabled": True},
-    {"id": 3, "name": "Command Injection", "description": "Prevents OS command execution", "enabled": True},
-    {"id": 4, "name": "Path Traversal", "description": "Blocks unauthorized file access", "enabled": True},
-    {"id": 5, "name": "Rate Limiting", "description": "Limits excessive requests", "enabled": True}
-]
+# Load Protection Rules from Database
+def load_protection_rules():
+    rules = list(rules_collection.find({}, {"_id": 0}))  # Exclude MongoDB's default `_id` field
+    if not rules:
+        # Insert default rules if not present
+        default_rules = [
+            {"id": 1, "name": "SQLi", "description": "Detects SQL injection", "enabled": True},
+            {"id": 2, "name": "XSS", "description": "Detects cross-site scripting", "enabled": True},
+            {"id": 3, "name": "Command Injection", "description": "Prevents OS command execution", "enabled": True},
+            {"id": 4, "name": "Path Traversal", "description": "Blocks unauthorized file access", "enabled": True},
+            {"id": 5, "name": "Rate Limiting", "description": "Limits excessive requests", "enabled": True}
+        ]
+        rules_collection.insert_many(default_rules)
+        return default_rules
+    return rules
+
+protection_rules = load_protection_rules()
 
 # API Endpoints
-@app.route('/api/home', methods=['GET'])
+@app.route("/api/home", methods=["GET"])
 @limiter.limit("5 per minute")
 def home():
     return jsonify({"message": "Welcome to the Web Application Firewall!"})
@@ -68,6 +67,7 @@ def update_protection_rule(rule_id):
     for rule in protection_rules:
         if rule["id"] == rule_id:
             rule["enabled"] = data.get("enabled", rule["enabled"])
+            rules_collection.update_one({"id": rule_id}, {"$set": {"enabled": rule["enabled"]}})
             return jsonify({"message": "Rule updated successfully.", "rule": rule}), 200
     return jsonify({"error": "Rule not found"}), 404
 
@@ -87,15 +87,6 @@ def user_input():
 
     return jsonify({"message": "Safe Request"}), 200
 
-# Serve Frontend (React App)
-@app.route("/")
-@app.route("/<path:path>")
-def serve_frontend(path="index.html"):
-    try:
-        return send_from_directory(app.static_folder, path)
-    except Exception:
-        return send_from_directory(app.static_folder, "index.html")
-
 # WAF Functions
 def detect_attack(input_data):
     for rule in protection_rules:
@@ -105,15 +96,30 @@ def detect_attack(input_data):
                     if re.search(pattern, input_data, re.IGNORECASE):
                         return rule["name"]
                 except re.error as e:
-                    error_logger.error(f"Invalid regex pattern: {pattern} -> {e}")
+                    print(f"Invalid regex pattern: {pattern} -> {e}")
                     continue
     return None
 
-# Logging Function (Without Database)
+# Logging Function (MongoDB)
 def log_attack(ip, input_data, threat_detected):
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    access_logger.info(f"INPUT: {input_data} - IP: {ip} - THREAT: {threat_detected}")
+    log_entry = {
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "ip": ip,
+        "input": input_data,
+        "threat": threat_detected
+    }
+    logs_collection.insert_one(log_entry)
 
-if __name__ != "__main__":
+# Serve Frontend (React App)
+@app.route("/")
+@app.route("/<path:path>")
+def serve_frontend(path="index.html"):
+    try:
+        return send_from_directory(app.static_folder, path)
+    except Exception:
+        return send_from_directory(app.static_folder, "index.html")
+
+if __name__ == "__main__":
+    app.run(debug=True)
     
     gunicorn_app = app
