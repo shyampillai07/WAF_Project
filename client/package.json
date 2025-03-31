@@ -13,10 +13,7 @@
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.2.0",
     "react-scripts": "^5.0.1",
-<<<<<<< HEAD
     "resolve-url-loader": "^5.0.0",
-=======
->>>>>>> d9afe463af19b7ddee4344ada841d9caba121c9e
     "sass": "^1.85.1",
     "tailwindcss": "^4.0.17",
     "web-vitals": "^2.1.4"
