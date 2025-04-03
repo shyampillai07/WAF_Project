@@ -30,3 +30,8 @@ database/
 
 # Ignore dependencies
 node_modules/
+
+# Ignore environment files
+.env
+*.env
+*.env.local
