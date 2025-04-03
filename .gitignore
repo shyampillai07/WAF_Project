@@ -30,8 +30,9 @@ database/
 
 # Ignore dependencies
 node_modules/
-
+ 
 # Ignore environment files
-WAF_Project\.env
+ .env
+*.env
 
 
