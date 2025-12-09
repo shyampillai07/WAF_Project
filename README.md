@@ -2,7 +2,7 @@
 
 A **Web Application Firewall (WAF)** built using **Flask, MongoDB, and React**, designed to detect and block common web threats such as **SQL Injection, XSS, Command Injection, and LFI/RFI Attacks**.  
 
-## ** Features**  
+## **Features**  
 
 ✔ **SQL Injection Protection** – Detects and blocks malicious SQL queries.  
 ✔ **Cross-Site Scripting (XSS) Protection** – Prevents client-side script injections.  
@@ -13,7 +13,7 @@ A **Web Application Firewall (WAF)** built using **Flask, MongoDB, and React**, 
 ✔ **Interactive UI** – A **React-based frontend** with real-time logs & analytics.  
 ✔ **Docker & Render Deployment** – Easily deployable using **Docker & Render**.  
 
-## ** Tech Stack**  
+## **Tech Stack**  
 
 | **Category**    | **Technology**         |
 |----------------|-----------------------|
@@ -23,7 +23,7 @@ A **Web Application Firewall (WAF)** built using **Flask, MongoDB, and React**, 
 | **Web Server** | Gunicorn               |
 | **Deployment** | Docker, Render         |
 
-## ** Security Checks Implemented**  
+## **Security Checks Implemented**  
 
  **SQL Injection (SQLi)** detection and blocking.  
  **Cross-Site Scripting (XSS)** prevention.  
@@ -103,7 +103,7 @@ Contributions are welcome! Feel free to **fork** this repository, create new fea
 ## **License**  
 This project is open-source under the **MIT License**.  
 
-## ** Project Contributors** 
+## **Project Contributors** 
 1.**Shyam Pillai**.<br>
 2.**Suchit Naik**.<br>
 3.**Aishwaraya Raikar**.<br>
