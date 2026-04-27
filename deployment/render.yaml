@@ -1,15 +1,23 @@
 services:
   - name: waf-app
     type: web
-    runtime: docker
+    runtime: python
     repo: https://github.com/shyampillai07/WAF_Project
     branch: main
     plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -c deployment/gunicorn_config.py app:app
     envVars:
       - key: PORT
         value: 5000
-      - key: DATABASE_URL
-        value: "sqlite:////opt/render/database/waf_logs.db"
+      - key: MONGO_URI
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: FLASK_SECRET_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: "https://waf-project.onrender.com,https://waf-project-1.onrender.com"
     disk:
       name: waf-data
       mountPath: /opt/render/database

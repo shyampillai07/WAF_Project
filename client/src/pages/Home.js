@@ -8,27 +8,21 @@ function Home() {
   const [message, setMessage] = useState("Loading...");
 
   useEffect(() => {
-    console.log("✅ Home Component Loaded");
-
     if (!API_BASE_URL) {
-      console.error("❌ API_BASE_URL is not defined!");
       setMessage("Error: API URL is missing.");
       return;
     }
 
     const fetchHomeData = async () => {
       try {
-        console.log("🔹 Fetching home data...");
         const response = await fetch(`${API_BASE_URL}/api/home`);
 
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
         const data = await response.json();
-        console.log("✅ API Response:", data);
 
         setMessage(data.message || "Welcome to WAF Dashboard");
       } catch (err) {
-        console.error("❌ Error fetching home data:", err.message);
         setMessage(`Error: ${err.message}`);
       }
     };

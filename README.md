@@ -1,109 +1,123 @@
-# **Web Application Firewall (WAF) Project**  
+# Web Application Firewall (WAF) Project
 
-A **Web Application Firewall (WAF)** built using **Flask, MongoDB, and React**, designed to detect and block common web threats such as **SQL Injection, XSS, Command Injection, and LFI/RFI Attacks**.  
+A Flask + React web application firewall demo that detects and blocks common web attacks before they reach backend business logic.
 
-## **Features**  
+## Features
 
-✔ **SQL Injection Protection** – Detects and blocks malicious SQL queries.  
-✔ **Cross-Site Scripting (XSS) Protection** – Prevents client-side script injections.  
-✔ **Command Injection Prevention** – Blocks unauthorized system command execution.  
-✔ **Local/Remote File Inclusion (LFI/RFI) Defense** – Restricts unauthorized file access.  
-✔ **IP Rate Limiting** – Prevents abuse by limiting repeated requests.  
-✔ **Logging & Monitoring** – Logs all suspicious activity in **MongoDB Atlas**.  
-✔ **Interactive UI** – A **React-based frontend** with real-time logs & analytics.  
-✔ **Docker & Render Deployment** – Easily deployable using **Docker & Render**.  
+- SQL injection detection
+- XSS detection
+- Command injection detection
+- Path traversal detection
+- Request rate limiting on sensitive endpoints
+- Attack logging to MongoDB
+- Admin-gated protection rule toggling (server-side session auth)
 
-## **Tech Stack**  
+## Tech Stack
 
-| **Category**    | **Technology**         |
-|----------------|-----------------------|
-| **Frontend**   | React, TailwindCSS, ShadCN |
-| **Backend**    | Python (Flask)         |
-| **Database**   | MongoDB (Atlas)        |
-| **Web Server** | Gunicorn               |
-| **Deployment** | Docker, Render         |
+- Backend: Flask, Flask-Limiter, PyMongo
+- Frontend: React, React Router, SCSS
+- Database: MongoDB Atlas
+- Production server: Gunicorn
+- Deployment: Render (Python Web Service)
 
-## **Security Checks Implemented**  
+## Current Security Model
 
- **SQL Injection (SQLi)** detection and blocking.  
- **Cross-Site Scripting (XSS)** prevention.  
- **Command Injection** filtering.  
- **Path Traversal & Local File Inclusion (LFI/RFI)** blocking.  
- **Rate Limiting** to prevent abuse and DoS attacks.  
+- Pattern-based inspection for incoming user input against enabled rules
+- Per-IP rate limiting for key API routes
+- Protected rule updates via admin login session
+- CSRF token validation on admin and rule-update state-changing endpoints
+- Secure cookie defaults:
+  - HttpOnly session cookie
+  - Configurable SameSite and Secure flags
+- Configurable CORS allowlist
 
-## **Setup & Installation**  
+## Environment Variables
 
-### **1. Clone the Repository**  
+Required for backend:
+
+- MONGO_URI: MongoDB connection string
+- ADMIN_PASSWORD: Password used by admin login endpoint
+- FLASK_SECRET_KEY: Secret used to sign session cookies
+
+Optional for backend:
+
+- CORS_ORIGINS: Comma-separated list of allowed origins
+- SESSION_COOKIE_SECURE: true or false
+- SESSION_COOKIE_SAMESITE: Lax, Strict, or None
+
+Optional for frontend:
+
+- REACT_APP_API_BASE_URL: Backend base URL
+
+## Local Development
+
+1. Clone repository
+
 ```sh
 git clone https://github.com/yourusername/WAF_Project.git
 cd WAF_Project
 ```
 
-### **2.Install Backend Dependencies**  
+1. Install backend dependencies
+
 ```sh
 pip install -r requirements.txt
 ```
 
-### **3.Set Up MongoDB Atlas**  
-1. **Create a MongoDB Atlas Account** at [MongoDB Atlas](https://www.mongodb.com/atlas).  
-2. **Set up a cluster** and create a database.  
-3. **Get your MongoDB URI** and update the `.env` file:  
-   ```sh
-   MONGO_URI="your_mongodb_connection_string"
-   ```
+1. Create .env file in project root
 
-### **4.Install Frontend Dependencies**  
-```sh
-cd client
-npm install
+```env
+MONGO_URI=your_mongodb_connection_string
+ADMIN_PASSWORD=your_admin_password
+FLASK_SECRET_KEY=replace_with_long_random_secret
+SESSION_COOKIE_SECURE=false
+SESSION_COOKIE_SAMESITE=Lax
 ```
 
-### **5.Run the Backend**  
+1. Run backend
+
 ```sh
 python app.py
 ```
-The backend will run at **http://127.0.0.1:5000**.  
 
-### **6.Run the Frontend**  
+1. Install and run frontend
+
 ```sh
 cd client
+npm install
 npm start
 ```
-The frontend will run at **http://localhost:3000**.  
 
-## **Deploy with Docker**  
+Frontend runs at <http://localhost:3000> and backend at <http://127.0.0.1:5000>.
 
-### **1.Build the Docker Image**  
-```sh
-docker build -t waf_project .
-```
+## Deploy on Render
 
-### **2.Run the Container**  
-```sh
-docker run -p 5000:5000 --env-file .env waf_project
-```
+This repository includes [deployment/render.yaml](deployment/render.yaml) for backend deployment.
 
-## **Deploy on Render**  
+Set these environment variables in Render:
 
-### **1.Backend Deployment**  
-1. **Push your changes to GitHub**.  
-2. **Connect the repository to Render**.  
-3. **Set up a Web Service** for Flask using `render.yaml`.  
+- MONGO_URI
+- ADMIN_PASSWORD
+- FLASK_SECRET_KEY
+- CORS_ORIGINS (recommended)
 
-### **2.Frontend Deployment**  
-1. Inside the `client/` folder, run:  
-   ```sh
-   npm run build
-   ```
-2. Upload the `build/` folder to **Render** as a **Static Site**.  
+## API Overview
 
-## **Contributing**  
-Contributions are welcome! Feel free to **fork** this repository, create new features, and submit **pull requests**.  
+- GET /api/home
+- POST /api/user-input
+- GET /api/protection-rules
+- PATCH /api/protection-rules/:id (admin session required)
+- GET /api/admin/status
+- GET /api/admin/csrf-token
+- POST /api/admin/login
+- POST /api/admin/logout
 
-## **License**  
-This project is open-source under the **MIT License**.  
+For POST and PATCH admin-protected actions, send X-CSRF-Token with the value from GET /api/admin/csrf-token.
 
-## **Project Contributors** 
-1.**Shyam Pillai**.<br>
-2.**Suchit Naik**.<br>
-3.**Aishwaraya Raikar**.<br>
+## Notes
+
+This project provides practical baseline protection for common attack patterns. For stricter production security, add stronger account controls, endpoint audit trails, and centralized security monitoring.
+
+## License
+
+MIT

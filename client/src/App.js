@@ -14,7 +14,6 @@ function App() {
   return (
     <Router>
       <div className="app-container">
-        {/* Top Navigation Bar */}
         <header className="top-nav">
           <button className="menu-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
             <FaBars />
@@ -24,9 +23,7 @@ function App() {
           </Link>
         </header>
 
-        {/* Main Layout */}
         <div className={`main-layout ${isSidebarOpen ? "" : "sidebar-closed"}`}>
-          {/* Sidebar Navigation */}
           <aside className={`sidebar ${isSidebarOpen ? "" : "closed"}`}>
             <nav>
               <ul>
@@ -52,7 +49,6 @@ function App() {
             </nav>
           </aside>
 
-          {/* Main Content */}
           <main className="content">
             <div className="page-wrapper">
               <Suspense fallback={<div>Loading...</div>}>
