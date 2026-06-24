@@ -118,6 +118,11 @@ For POST and PATCH admin-protected actions, send X-CSRF-Token with the value fro
 
 This project provides practical baseline protection for common attack patterns. For stricter production security, add stronger account controls, endpoint audit trails, and centralized security monitoring.
 
+## Contributors
+1.Shyam Pillai<br>
+2.Suchit Naik<br>
+3.Aishwaraya Raikar<br>
+
 ## License
 
 MIT
