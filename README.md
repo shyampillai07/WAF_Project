@@ -1,128 +1,227 @@
-# Web Application Firewall (WAF) Project
+<div align="center">
 
-A Flask + React web application firewall demo that detects and blocks common web attacks before they reach backend business logic.
+# Web Application Firewall (WAF)
+
+Enterprise-grade Web Application Firewall built with Flask, React, and MongoDB.
+
+<p align="center">
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![SCSS](https://img.shields.io/badge/SCSS-CC6699?style=for-the-badge&logo=sass&logoColor=white)
+![Render](https://img.shields.io/badge/Render-430098?style=for-the-badge&logo=render&logoColor=white)
+
+</p>
+
+</div>
+
+
+
+## Overview
+
+This project demonstrates a Web Application Firewall (WAF) that inspects incoming HTTP requests, detects common web attacks, blocks malicious payloads, and logs security events before requests reach backend application logic.
+
+
 
 ## Features
 
-- SQL injection detection
-- XSS detection
-- Command injection detection
-- Path traversal detection
-- Request rate limiting on sensitive endpoints
-- Attack logging to MongoDB
-- Admin-gated protection rule toggling (server-side session auth)
+- SQL Injection Detection
+- Cross-Site Scripting (XSS) Detection
+- Command Injection Detection
+- Path Traversal Detection
+- Request Rate Limiting
+- MongoDB Attack Logging
+- CSRF Protection
+- Secure Session Authentication
+- Configurable CORS Allowlist
+- Runtime Protection Rule Management
 
-## Tech Stack
 
-- Backend: Flask, Flask-Limiter, PyMongo
-- Frontend: React, React Router, SCSS
-- Database: MongoDB Atlas
-- Production server: Gunicorn
-- Deployment: Render (Python Web Service)
 
-## Current Security Model
+## Technology Stack
 
-- Pattern-based inspection for incoming user input against enabled rules
-- Per-IP rate limiting for key API routes
-- Protected rule updates via admin login session
-- CSRF token validation on admin and rule-update state-changing endpoints
-- Secure cookie defaults:
-  - HttpOnly session cookie
-  - Configurable SameSite and Secure flags
-- Configurable CORS allowlist
+<table>
+<tr>
 
-## Environment Variables
+<td align="center" width="170">
+<img src="https://skillicons.dev/icons?i=python" width="60"><br>
+<b>Python</b>
+</td>
 
-Required for backend:
+<td align="center" width="170">
+<img src="https://skillicons.dev/icons?i=flask" width="60"><br>
+<b>Flask</b>
+</td>
 
-- MONGO_URI: MongoDB connection string
-- ADMIN_PASSWORD: Password used by admin login endpoint
-- FLASK_SECRET_KEY: Secret used to sign session cookies
+<td align="center" width="170">
+<img src="https://skillicons.dev/icons?i=react" width="60"><br>
+<b>React</b>
+</td>
 
-Optional for backend:
+<td align="center" width="170">
+<img src="https://skillicons.dev/icons?i=mongodb" width="60"><br>
+<b>MongoDB Atlas</b>
+</td>
 
-- CORS_ORIGINS: Comma-separated list of allowed origins
-- SESSION_COOKIE_SECURE: true or false
-- SESSION_COOKIE_SAMESITE: Lax, Strict, or None
+</tr>
 
-Optional for frontend:
+<tr>
 
-- REACT_APP_API_BASE_URL: Backend base URL
+<td align="center">
+<img src="https://skillicons.dev/icons?i=sass" width="60"><br>
+<b>SCSS</b>
+</td>
 
-## Local Development
+<td align="center">
+<img src="https://skillicons.dev/icons?i=git" width="60"><br>
+<b>Git</b>
+</td>
 
-1. Clone repository
+<td align="center">
+<img src="https://skillicons.dev/icons?i=github" width="60"><br>
+<b>GitHub</b>
+</td>
 
-```sh
+<td align="center">
+<img src="https://skillicons.dev/icons?i=postman" width="60"><br>
+<b>Postman</b>
+</td>
+
+</tr>
+</table>
+
+
+
+## Architecture
+
+```text
+Client
+   │
+   ▼
+React Frontend
+   │
+   ▼
+Flask WAF Engine
+   │
+   ├── SQL Injection Detection
+   ├── XSS Detection
+   ├── Command Injection Detection
+   ├── Path Traversal Detection
+   ├── Rate Limiting
+   ▼
+Backend APIs
+   │
+   ▼
+MongoDB
+```
+
+
+
+## Security Features
+
+| Feature | Description |
+|----------|-------------|
+| SQL Injection Protection | Detects SQL injection payloads |
+| XSS Protection | Blocks cross-site scripting attacks |
+| Command Injection Protection | Prevents command execution attempts |
+| Path Traversal Protection | Detects directory traversal payloads |
+| Rate Limiting | Limits repeated requests from the same IP |
+| CSRF Protection | Secures state-changing admin operations |
+| Secure Sessions | Uses HttpOnly cookies with configurable SameSite and Secure flags |
+| Attack Logging | Stores blocked requests in MongoDB |
+
+
+
+## Project Structure
+
+```text
+WAF_Project/
+│
+├── client/
+├── deployment/
+├── app.py
+├── requirements.txt
+├── .env
+└── README.md
+```
+
+
+
+## Installation
+
+### Clone Repository
+
+```bash
 git clone https://github.com/yourusername/WAF_Project.git
 cd WAF_Project
 ```
 
-1. Install backend dependencies
+### Backend
 
-```sh
+```bash
 pip install -r requirements.txt
-```
-
-1. Create .env file in project root
-
-```env
-MONGO_URI=your_mongodb_connection_string
-ADMIN_PASSWORD=your_admin_password
-FLASK_SECRET_KEY=replace_with_long_random_secret
-SESSION_COOKIE_SECURE=false
-SESSION_COOKIE_SAMESITE=Lax
-```
-
-1. Run backend
-
-```sh
 python app.py
 ```
 
-1. Install and run frontend
+### Frontend
 
-```sh
+```bash
 cd client
 npm install
 npm start
 ```
 
-Frontend runs at <http://localhost:3000> and backend at <http://127.0.0.1:5000>.
 
-## Deploy on Render
 
-This repository includes [deployment/render.yaml](deployment/render.yaml) for backend deployment.
+## Environment Variables
 
-Set these environment variables in Render:
+```env
+MONGO_URI=
+ADMIN_PASSWORD=
+FLASK_SECRET_KEY=
+SESSION_COOKIE_SECURE=false
+SESSION_COOKIE_SAMESITE=Lax
+CORS_ORIGINS=
+REACT_APP_API_BASE_URL=
+```
 
-- MONGO_URI
-- ADMIN_PASSWORD
-- FLASK_SECRET_KEY
-- CORS_ORIGINS (recommended)
 
-## API Overview
 
-- GET /api/home
-- POST /api/user-input
-- GET /api/protection-rules
-- PATCH /api/protection-rules/:id (admin session required)
-- GET /api/admin/status
-- GET /api/admin/csrf-token
-- POST /api/admin/login
-- POST /api/admin/logout
+## API Endpoints
 
-For POST and PATCH admin-protected actions, send X-CSRF-Token with the value from GET /api/admin/csrf-token.
+| Method | Endpoint |
+|---------|----------|
+| GET | `/api/home` |
+| POST | `/api/user-input` |
+| GET | `/api/protection-rules` |
+| PATCH | `/api/protection-rules/:id` |
+| GET | `/api/admin/status` |
+| GET | `/api/admin/csrf-token` |
+| POST | `/api/admin/login` |
+| POST | `/api/admin/logout` |
 
-## Notes
 
-This project provides practical baseline protection for common attack patterns. For stricter production security, add stronger account controls, endpoint audit trails, and centralized security monitoring.
+
+## Deployment
+
+Backend deployment is configured using:
+
+```
+deployment/render.yaml
+```
+
+
 
 ## Contributors
-1.Shyam Pillai<br>
-2.Suchit Naik<br>
-3.Aishwaraya Raikar<br>
+
+- Shyam Pillai
+- Suchit Naik
+- Aishwaraya Raikar
+
+
 
 ## License
 
-MIT
+This project is licensed under the MIT License.
